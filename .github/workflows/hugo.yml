@@ -1,29 +1,34 @@
-name: Auto deploy hugo
+name: deploy
+
+# 代码提交到main分支时触发github action
 on:
   push:
-    branches: # 触发分支
-      - source
+    branches:
+      - main
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@master
-        with:
-          submodules: true # 检查 Hugo themes 更新
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+              fetch-depth: 0
 
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
-        with:
-          hugo-version: 'latest'
+        - name: Setup Hugo
+          uses: peaceiris/actions-hugo@v3
+          with:
+              hugo-version: "latest"
+              extended: true
 
-      - name: Build
-        run: hugo --minify
+        - name: Build Web
+          run: hugo -D
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          publish_dir: ./public
-          publish_branch: master # 部署目的分支
+        - name: Deploy Web
+          uses: peaceiris/actions-gh-pages@v4
+          with:
+              PERSONAL_TOKEN: ${{ secrets.你的token变量名 }}
+              EXTERNAL_REPOSITORY: 你的github名/你的仓库名
+              PUBLISH_BRANCH: main
+              PUBLISH_DIR: ./public
+              commit_message: auto deploy
