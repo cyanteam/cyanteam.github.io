@@ -1,0 +1,29 @@
+name: Auto deploy hugo
+on:
+  push:
+    branches: # 触发分支
+      - source
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+        with:
+          submodules: true # 检查 Hugo themes 更新
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: 'latest'
+
+      - name: Build
+        run: hugo --minify
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          publish_dir: ./public
+          publish_branch: master # 部署目的分支
